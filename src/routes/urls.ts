@@ -45,7 +45,7 @@ export const addUrl = async (req: Request, res: Response) => {
             message: "Successfully added new redirect. ",
             url: `${process.env.DOMAIN}/${slug}`,
             redirectTo: url,
-            slug
+            slug,
         });
     });
 };
@@ -82,4 +82,19 @@ export const getUrls = (req: Request, res: Response) => {
             });
             res.status(200).json(redirectList);
         });
+};
+
+// TODO: Add how many clicks a url haves and auth for watching private urls
+export const getUrlInfo = (req: Request, res: Response) => {
+    const { slug } = req.params;
+    Redirect.findOne({ slug, publicUrl: true }).exec((err, red) => {
+        if (err) res.status(500).json({ error: "An error occured." });
+        else if (red === null)
+            res.status(400).json({ error: "Couldn't find url. " });
+        else
+            res.status(200).json({
+                url: `${process.env.DOMAIN}/${red.slug}`,
+                redirectsTo: red.url,
+            });
+    });
 };

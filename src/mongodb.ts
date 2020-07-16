@@ -27,7 +27,7 @@ const redirectSchema = new mongoose.Schema({
     url: {
         type: String,
         required: true,
-        minlength: 10,
+        minlength: 6,
     },
     createdAt: {
         type: String,
