@@ -1,14 +1,13 @@
 import express from "express";
+import cors from "cors";
 
 import { addUrl, getUrls, redirect } from "./routes/urls";
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
-app.use("/dashboard", express.static("web"));
-app.get("/dashboard/*", (_, res) => res.redirect("/dashboard"));
-app.get("/", (_, res) => res.redirect("/dashboard"));
 
 app.post("/new", addUrl); // New Redirect
 app.get("/urls", getUrls); // Get 10 latest Redirects

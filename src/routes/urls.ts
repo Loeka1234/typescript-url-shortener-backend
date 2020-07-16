@@ -40,10 +40,12 @@ export const addUrl = async (req: Request, res: Response) => {
             console.log(err);
             return res.status(500).json({ error: "Couldn't save url." });
         }
+        console.log("Redirect created: " + red);
         res.status(200).json({
             message: "Successfully added new redirect. ",
             url: `${process.env.DOMAIN}/${slug}`,
             redirectTo: url,
+            slug
         });
     });
 };
