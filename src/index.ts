@@ -8,6 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.get("/", (req, res) => res.redirect("http://web.shortto.me"));
 
 app.post("/new", addUrl); // New Redirect
 app.get("/urls", getUrls); // Get 10 latest Redirects

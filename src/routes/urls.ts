@@ -5,9 +5,16 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+interface Body {
+    slug: string;
+    url: string;
+    customSlug: boolean;
+    publicUrl: boolean;
+}
+
 // Adds a new url
 export const addUrl = async (req: Request, res: Response) => {
-    let { slug, url, customSlug, publicUrl } = req.body;
+    let { slug, url, customSlug, publicUrl }: Body = req.body;
     if (
         typeof url !== "string" ||
         !url.trim() ||
@@ -17,6 +24,7 @@ export const addUrl = async (req: Request, res: Response) => {
         return res
             .status(400)
             .json({ error: "Please provide valid information." });
+    if (slug.includes("/") || slug.includes("\\")) return res.status(400).json({ error: "You can't use backslashes or forward slashes in your url." }); 
     if (!url.toLowerCase().startsWith("http://")) url = "http://" + url;
 
     if (!customSlug) slug = shortid.generate();
