@@ -15,7 +15,8 @@ export interface IRedirect extends Document {
     slug: string,
     url: string,
     createdAt: string,
-    publicUrl: boolean
+    publicUrl: boolean,
+    clicks: number
 }
 
 const redirectSchema = new mongoose.Schema({
@@ -37,6 +38,11 @@ const redirectSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
     },
+    clicks: {
+        type: Number,
+        default: 0,
+        required: true
+    }
 });
 
 export default mongoose.model<IRedirect>("Redirect", redirectSchema);

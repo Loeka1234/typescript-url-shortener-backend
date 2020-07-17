@@ -24,12 +24,22 @@ export const addUrl = async (req: Request, res: Response) => {
         return res
             .status(400)
             .json({ error: "Please provide valid information." });
-    if (slug.includes("/") || slug.includes("\\")) return res.status(400).json({ error: "You can't use backslashes or forward slashes in your url." }); 
+    if (slug.includes("/") || slug.includes("\\"))
+        return res.status(400).json({
+            error: "You can't use backslashes or forward slashes in your url.",
+        });
     if (!url.toLowerCase().startsWith("http://")) url = "http://" + url;
 
     if (!customSlug) slug = shortid.generate();
-    if (customSlug && slug == "urls")
-        return res.status(400).json({ error: "Redirect already exists." });
+
+    // Reserved slugs
+    switch (slug) {
+        case "urls":
+        case "info":
+            return res.status(400).json({ error: "Redirect already exists." });
+        default:
+            break;
+    }
 
     const exists = await Redirect.findOne({ slug });
     if (exists)
@@ -63,17 +73,19 @@ export const redirect = async (req: Request, res: Response) => {
     const doc = await Redirect.findOne({ slug: req.params.custom });
     if (!doc) return res.redirect("/");
     res.redirect(doc.url);
+    await Redirect.updateOne(
+        { slug: req.params.custom },
+        { clicks: doc.clicks + 1 }
+    );
 };
 
 export const getUrls = (req: Request, res: Response) => {
-    Redirect.find({ public: true })
+    Redirect.find({ publicUrl: true })
         .sort({ createdAt: -1 })
         .limit(10)
         .exec((err, redirects) => {
             if (err)
                 return res.status(200).json({ error: "Internal server error" });
-
-            // console.log(redirects);
 
             let redirectList: {
                 createdAt: string;
@@ -84,10 +96,11 @@ export const getUrls = (req: Request, res: Response) => {
                 const { createdAt, slug, url } = redirect;
                 redirectList.push({
                     createdAt,
-                    url: `${process.env.DOMAIN}/${slug}`,
+                    url: `http://${process.env.DOMAIN}/${slug}`,
                     redirectTo: url,
                 });
             });
+
             res.status(200).json(redirectList);
         });
 };
@@ -103,6 +116,7 @@ export const getUrlInfo = (req: Request, res: Response) => {
             res.status(200).json({
                 url: `http://${process.env.DOMAIN}/${red.slug}`,
                 redirectsTo: red.url,
+                clicks: red.clicks,
             });
     });
 };
