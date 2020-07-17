@@ -93,7 +93,7 @@ export const getUrlInfo = (req: Request, res: Response) => {
             res.status(400).json({ error: "Couldn't find url. " });
         else
             res.status(200).json({
-                url: `${process.env.DOMAIN}/${red.slug}`,
+                url: `http://${process.env.DOMAIN}/${red.slug}`,
                 redirectsTo: red.url,
             });
     });
