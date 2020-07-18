@@ -24,7 +24,7 @@ export const addUrl = async (req: Request, res: Response) => {
         return res
             .status(400)
             .json({ error: "Please provide valid information." });
-    if (slug.includes("/") || slug.includes("\\"))
+    if (customSlug && (slug.includes("/") || slug.includes("\\")))
         return res.status(400).json({
             error: "You can't use backslashes or forward slashes in your url.",
         });
@@ -91,6 +91,7 @@ export const getUrls = (req: Request, res: Response) => {
                 createdAt: string;
                 url: string;
                 redirectTo: string;
+                slug: string;
             }[] = [];
             redirects.forEach(redirect => {
                 const { createdAt, slug, url } = redirect;
@@ -98,6 +99,7 @@ export const getUrls = (req: Request, res: Response) => {
                     createdAt,
                     url: `http://${process.env.DOMAIN}/${slug}`,
                     redirectTo: url,
+                    slug
                 });
             });
 
