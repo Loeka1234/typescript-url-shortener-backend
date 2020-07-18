@@ -2,19 +2,13 @@ import { Request, Response } from "express";
 import Redirect from "../mongodb";
 import shortid from "shortid";
 import dotenv from "dotenv";
+import { AddUrlBody } from "../types";
 
 dotenv.config();
 
-interface Body {
-    slug: string;
-    url: string;
-    customSlug: boolean;
-    publicUrl: boolean;
-}
-
 // Adds a new url
 export const addUrl = async (req: Request, res: Response) => {
-    let { slug, url, customSlug, publicUrl }: Body = req.body;
+    let { slug, url, customSlug, publicUrl }: AddUrlBody = req.body;
     if (
         typeof url !== "string" ||
         !url.trim() ||
@@ -107,7 +101,7 @@ export const getUrls = (req: Request, res: Response) => {
         });
 };
 
-// TODO: Add how many clicks a url haves and auth for watching private urls
+// TODO: Add auth for watching private urls
 export const getUrlInfo = (req: Request, res: Response) => {
     const { slug } = req.params;
     Redirect.findOne({ slug, publicUrl: true }).exec((err, red) => {
