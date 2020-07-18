@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
-import Redirect from "../mongodb";
+import { Redirect } from "../mongodb";
 import shortid from "shortid";
 import dotenv from "dotenv";
 import { AddUrlBody } from "../types";
+import { formatRedirects, formatRedirect } from "../format";
 
 dotenv.config();
 
@@ -28,8 +29,7 @@ export const addUrl = async (req: Request, res: Response) => {
 
     // Reserved slugs
     switch (slug) {
-        case "urls":
-        case "info":
+        case "api":
             return res.status(400).json({ error: "Redirect already exists." });
         default:
             break;
@@ -39,13 +39,15 @@ export const addUrl = async (req: Request, res: Response) => {
     if (exists)
         return res.status(400).json({ error: "Redirect already exists." });
 
-    if (typeof publicUrl !== "boolean") publicUrl = true;
+    if (typeof publicUrl !== "boolean")
+        return res.status(400).json({ error: "publicUrl should be a boolean" });
 
     const redirect = new Redirect({
         slug,
         url,
         publicUrl,
         createdAt: new Date().toISOString(),
+        user: res.locals.authenticated ? res.locals.user.email : null,
     });
     redirect.save((err, red) => {
         if (err) {
@@ -55,9 +57,8 @@ export const addUrl = async (req: Request, res: Response) => {
         console.log("Redirect created: " + red);
         res.status(200).json({
             message: "Successfully added new redirect. ",
-            url: `${process.env.DOMAIN}/${slug}`,
-            redirectTo: url,
-            slug,
+            ...formatRedirect(red),
+            user: res.locals.authenticated ? res.locals.user.email : null,
         });
     });
 };
@@ -73,46 +74,43 @@ export const redirect = async (req: Request, res: Response) => {
     );
 };
 
+// Get public urls
 export const getUrls = (req: Request, res: Response) => {
     Redirect.find({ publicUrl: true })
         .sort({ createdAt: -1 })
         .limit(10)
         .exec((err, redirects) => {
             if (err)
-                return res.status(200).json({ error: "Internal server error" });
-
-            let redirectList: {
-                createdAt: string;
-                url: string;
-                redirectTo: string;
-                slug: string;
-            }[] = [];
-            redirects.forEach(redirect => {
-                const { createdAt, slug, url } = redirect;
-                redirectList.push({
-                    createdAt,
-                    url: `http://${process.env.DOMAIN}/${slug}`,
-                    redirectTo: url,
-                    slug
-                });
-            });
-
-            res.status(200).json(redirectList);
+                return res.status(500).json({ error: "Internal server error" });
+            else res.status(200).json(formatRedirects(redirects));
         });
 };
 
-// TODO: Add auth for watching private urls
+// Get users urls
+export const getPrivateUrls = (req: Request, res: Response) => {
+    Redirect.find({ user: res.locals.user.email })
+        .sort({ createdAt: -1 })
+        .exec((err, redirects) => {
+            if (err)
+                return res
+                    .status(500)
+                    .json({ error: "Internal server error." });
+            return res.status(200).json(formatRedirects(redirects));
+        });
+};
+
+// Get info about public url // Get info about private url if authenticated
 export const getUrlInfo = (req: Request, res: Response) => {
     const { slug } = req.params;
-    Redirect.findOne({ slug, publicUrl: true }).exec((err, red) => {
+    Redirect.findOne({ slug }).exec((err, redirect) => {
         if (err) res.status(500).json({ error: "An error occured." });
-        else if (red === null)
+        else if (redirect === null)
             res.status(400).json({ error: "Couldn't find url. " });
-        else
-            res.status(200).json({
-                url: `http://${process.env.DOMAIN}/${red.slug}`,
-                redirectsTo: red.url,
-                clicks: red.clicks,
-            });
+        else if (
+            redirect.publicUrl === false &&
+            (!res.locals.user || redirect.user !== res.locals.user.email)
+        )
+            res.status(400).json({ error: "This is a private url." });
+        else res.status(200).json(formatRedirect(redirect));
     });
 };
