@@ -1,4 +1,4 @@
-import { IRedirect } from "./mongodb";
+import { IRedirect } from "../mongodb/redirectSchema";
 
 interface IOutput {
     createdAt: string;

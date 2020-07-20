@@ -1,10 +1,7 @@
 import { Request, Response } from "express";
 import { Redirect } from "../mongodb";
 import shortid from "shortid";
-import dotenv from "dotenv";
-import { formatRedirects, formatRedirect } from "../format";
-
-dotenv.config();
+import { formatRedirects, formatRedirect } from "../utils/format";
 
 // Adds a new url
 export const addUrl = async (req: Request, res: Response) => {

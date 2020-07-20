@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { User, RefreshToken } from "../mongodb";
+import { Ijwt } from "../../globaltypes";
 
 export const register = async (req: Request, res: Response) => {
     const { email, name, password }: RegisterBody = req.body;

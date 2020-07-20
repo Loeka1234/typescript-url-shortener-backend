@@ -14,8 +14,3 @@ interface AddUrlBody {
     email: string;
     password: string;
 }
-
-interface Ijwt {
-    email: string;
-    name: string;
-}

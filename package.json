@@ -4,9 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --exec ts-node --files src/index.ts",
+    "devAuth": "nodemon --exec ts-node --files src/#AuthServer/index.ts",
+    "devUrl": "nodemon --exec ts-node --files src/#UrlServer/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "startAuth": "node dist/#AuthServer/index.js",
+    "startUrl": "node dist/#UrlServer/index.js"
   },
   "keywords": [],
   "author": "",

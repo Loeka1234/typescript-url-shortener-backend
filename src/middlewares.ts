@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { Ijwt } from "./globaltypes";
 import jwt from "jsonwebtoken";
 
 export function authenticateToken(
