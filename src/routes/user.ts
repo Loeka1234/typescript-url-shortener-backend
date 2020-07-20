@@ -6,19 +6,13 @@ import { User, RefreshToken } from "../mongodb";
 export const register = async (req: Request, res: Response) => {
     const { email, name, password }: RegisterBody = req.body;
 
-    try {
-        const userExists = await User.findOne({ email });
-        if (userExists)
-            return res
-                .status(400)
-                .json({ error: "Email has already been taken. " });
+    if(!password || !password.trim()) return res.status(400).json({ error: "Please provide a valid password." });
+    if(!email || !email.trim()) return res.status(400).json({ error: "Please provide an email." });
+    if(!name || name.trim()) return res.status(400).json({ error: "Please provide a name." });
 
-        const hashedPassword = await bcrypt.hash(password, 10);
-            email,
-            name,
-            password: hashedPassword,
-        });
-        await user.save();
+    const exists = await User.exists({ email });
+    if (exists) return res.status(400).json({ error: "Email already in use." });
+
     const hashedPassword = await bcrypt.hash(password.trim(), 10);
     const user = new User({
         email,
