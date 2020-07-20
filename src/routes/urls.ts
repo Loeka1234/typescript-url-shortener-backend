@@ -41,6 +41,7 @@ export const addUrl = async (req: Request, res: Response) => {
     if (typeof publicUrl !== "boolean")
         return res.status(400).json({ error: "publicUrl should be a boolean" });
 
+
     const redirect = new Redirect({
         slug,
         url,
@@ -58,6 +59,7 @@ export const addUrl = async (req: Request, res: Response) => {
             message: "Successfully added new redirect. ",
             ...formatRedirect(red),
             user: req.authenticated ? req.user.email : null,
+            error: !req.authenticated ? "You are not logged in." : undefined,
         });
     });
 };
