@@ -13,7 +13,7 @@ export function authenticateToken(
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!, (err, user) => {
         if (err) return res.sendStatus(403);
-        res.locals.user = user;
+        req.user = user as IUser;
         next();
     });
 }
@@ -22,17 +22,17 @@ export function isAuthorized(req: Request, res: Response, next: NextFunction) {
     const authHeader = req.headers["authorization"];
     const token = authHeader?.split(" ")[1];
     if(!token) {
-        res.locals.authenticated = false;
+        req.authenticated = false;
         return next();
     }
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!, (err, user) => {
         if (err) {
-            res.locals.authenticated = false;
+            req.authenticated = false;
             return next();
         }
-        res.locals.authenticated = true;
-        res.locals.user = user;
+        req.authenticated = true;
+        req.user = user as IUser;
         return next();
     })
 }

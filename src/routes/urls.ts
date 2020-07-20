@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { Redirect } from "../mongodb";
 import shortid from "shortid";
 import dotenv from "dotenv";
-import { AddUrlBody } from "../types";
 import { formatRedirects, formatRedirect } from "../format";
 
 dotenv.config();
@@ -47,7 +46,7 @@ export const addUrl = async (req: Request, res: Response) => {
         url,
         publicUrl,
         createdAt: new Date().toISOString(),
-        user: res.locals.authenticated ? res.locals.user.email : null,
+        user: req.authenticated ? req.user.email : null,
     });
     redirect.save((err, red) => {
         if (err) {
@@ -58,7 +57,7 @@ export const addUrl = async (req: Request, res: Response) => {
         res.status(200).json({
             message: "Successfully added new redirect. ",
             ...formatRedirect(red),
-            user: res.locals.authenticated ? res.locals.user.email : null,
+            user: req.authenticated ? req.user.email : null,
         });
     });
 };
@@ -88,7 +87,7 @@ export const getUrls = (req: Request, res: Response) => {
 
 // Get users urls
 export const getPrivateUrls = (req: Request, res: Response) => {
-    Redirect.find({ user: res.locals.user.email })
+    Redirect.find({ user: req.user.email })
         .sort({ createdAt: -1 })
         .exec((err, redirects) => {
             if (err)
@@ -108,7 +107,7 @@ export const getUrlInfo = (req: Request, res: Response) => {
             res.status(400).json({ error: "Couldn't find url. " });
         else if (
             redirect.publicUrl === false &&
-            (!res.locals.user || redirect.user !== res.locals.user.email)
+            (!req.user || redirect.user !== req.user.email)
         )
             res.status(400).json({ error: "This is a private url." });
         else res.status(200).json(formatRedirect(redirect));

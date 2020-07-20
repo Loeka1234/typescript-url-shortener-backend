@@ -1,13 +1,7 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { RegisterBody, LoginBody } from "../types";
 import { User, RefreshToken } from "../mongodb";
-
-interface IUser {
-    email: string;
-    name: string;
-}
 
 export const register = async (req: Request, res: Response) => {
     const { email, name, password }: RegisterBody = req.body;
