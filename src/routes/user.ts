@@ -80,7 +80,7 @@ export const logout = (req: Request, res: Response) => {
     });
 }
 
-function generateAccessToken(user: IUser) {
+function generateAccessToken(user: Ijwt) {
     return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET!, {
         expiresIn: "15m",
     });

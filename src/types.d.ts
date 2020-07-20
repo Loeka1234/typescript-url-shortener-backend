@@ -15,7 +15,7 @@ interface AddUrlBody {
     password: string;
 }
 
-interface IUser {
+interface Ijwt {
     email: string;
     name: string;
 }
