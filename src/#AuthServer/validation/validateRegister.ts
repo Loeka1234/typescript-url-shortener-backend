@@ -1,27 +1,30 @@
 import validator from "validator";
+import { checkTypes, ISchema } from "../../utils/checkTypes";
 
-export const validateRegister = (data: RegisterBody): IError | null => {
+export const validateRegister = (data: RegisterBody): IError | undefined => {
+    const schema: ISchema = {
+        email: "string",
+        name: "string",
+        password: "string",
+    };
+
+    const error = checkTypes(data, schema);
+    if (error) return error;
+
     const { email, name, password } = data;
-    if (
-        !name ||
-        !(name.length >= 3 && name.length < 12 && validator.isAlpha(name))
-    )
+    if (name.length < 3 || name.length > 12 || !validator.isAlpha(name))
         return {
             field: "name",
             message: "Please provide a valid name.",
         };
-    if (!email || !validator.isEmail(email))
+    if (!validator.isEmail(email))
         return {
             field: "email",
             message: "Please provide a valid email.",
         };
-    if (
-        !password ||
-        !password.trim().match(/((?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20})/)
-    )
+    if (!password.trim().match(/((?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20})/))
         return {
             field: "password",
             message: "please provide a valid password.",
         };
-    return null;
 };

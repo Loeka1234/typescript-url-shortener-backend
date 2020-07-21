@@ -2,42 +2,27 @@ import { Request, Response } from "express";
 import { Redirect } from "../mongodb";
 import shortid from "shortid";
 import { formatRedirects, formatRedirect } from "../utils/format";
+import { validateAddUrl } from "../validation";
 
 // Adds a new url
 export const addUrl = async (req: Request, res: Response) => {
+    const error = validateAddUrl(req.body);
+    if(error) return res.status(400).json(error);
+
     let { slug, url, customSlug, publicUrl }: AddUrlBody = req.body;
-    if (
-        typeof url !== "string" ||
-        !url.trim() ||
-        typeof customSlug !== "boolean" ||
-        (customSlug == true && (typeof slug !== "string" || !slug.trim()))
-    )
-        return res
-            .status(400)
-            .json({ error: "Please provide valid information." });
-    if (customSlug && (slug.includes("/") || slug.includes("\\")))
-        return res.status(400).json({
-            error: "You can't use backslashes or forward slashes in your url.",
-        });
+
     if (!url.toLowerCase().startsWith("http://")) url = "http://" + url;
 
     if (!customSlug) slug = shortid.generate();
 
-    // Reserved slugs
-    switch (slug) {
-        case "api":
-            return res.status(400).json({ error: "Redirect already exists." });
-        default:
-            break;
-    }
-
     const exists = await Redirect.findOne({ slug });
-    if (exists)
-        return res.status(400).json({ error: "Redirect already exists." });
-
-    if (typeof publicUrl !== "boolean")
-        return res.status(400).json({ error: "publicUrl should be a boolean" });
-
+    if (exists) {
+        const error: IError = {
+            field: "slug",
+            message: "Redirect already exists."
+        }
+        return res.status(400).json(error);
+    }
 
     const redirect = new Redirect({
         slug,

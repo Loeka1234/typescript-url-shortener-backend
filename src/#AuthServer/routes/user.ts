@@ -30,8 +30,8 @@ export const register = async (req: Request, res: Response) => {
 };
 
 export const login = async (req: Request, res: Response) => {
-    const errors = validateLogin(req.body);
-    if(errors) return res.status(400).json(errors);
+    const error = validateLogin(req.body);
+    if(error) return res.status(400).json(error);
 
     const { email, password }: LoginBody = req.body;
 
