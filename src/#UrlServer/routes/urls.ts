@@ -7,7 +7,7 @@ import { validateAddUrl } from "../validation";
 // Adds a new url
 export const addUrl = async (req: Request, res: Response) => {
     const error = validateAddUrl(req.body);
-    if(error) return res.status(400).json(error);
+    if (error) return res.status(400).json(error);
 
     let { slug, url, customSlug, publicUrl }: AddUrlBody = req.body;
 
@@ -19,8 +19,8 @@ export const addUrl = async (req: Request, res: Response) => {
     if (exists) {
         const error: IError = {
             field: "slug",
-            message: "Redirect already exists."
-        }
+            message: "Redirect already exists.",
+        };
         return res.status(400).json(error);
     }
 
@@ -53,7 +53,10 @@ export const redirect = async (req: Request, res: Response) => {
     res.redirect(doc.url);
     await Redirect.updateOne(
         { slug: req.params.custom },
-        { clicks: doc.clicks + 1 }
+        {
+            clicks: doc.clicks + 1,
+            $push: { clickDates: new Date().toDateString() },
+        }
     );
 };
 

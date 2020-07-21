@@ -6,6 +6,7 @@ export interface IRedirect extends Document {
     createdAt: string;
     publicUrl: boolean;
     clicks: number;
+    clickDates: Array<string>;
     user: string | null;
 }
 
@@ -31,11 +32,15 @@ export const redirectSchema = new mongoose.Schema({
     clicks: {
         type: Number,
         default: 0,
-        required: true
+        required: true,
+    },
+    clickDates: {
+        type: [Date],
+        default: new Array(0)
     },
     user: {
         type: String,
         default: null,
-        required: false
-    }
+        required: false,
+    },
 });
