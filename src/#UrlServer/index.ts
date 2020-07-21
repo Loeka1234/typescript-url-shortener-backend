@@ -37,6 +37,8 @@ router.get("/info/:slug", isAuthorized, getUrlInfo); // Get url info about speci
 
 app.use("/api", router);
 
+app.get("*", (_, res) => res.redirect("http://web.shortto.me"));
+
 const PORT = process.env.URL_SERVER_PORT || 3000;
 
 app.listen(PORT, () => console.log(`Url server listening on localhost:${PORT}`));
