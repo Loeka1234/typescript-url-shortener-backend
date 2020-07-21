@@ -3,13 +3,13 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { User, RefreshToken } from "../mongodb";
 import { Ijwt } from "../../globaltypes";
+import { validateRegister, validateLogin } from "../validation";
 
 export const register = async (req: Request, res: Response) => {
-    const { email, name, password }: RegisterBody = req.body;
+    const errors = validateRegister(req.body);
+    if(errors) return res.status(400).json(errors);
 
-    if(!password || !password.trim()) return res.status(400).json({ error: "Please provide a valid password." });
-    if(!email || !email.trim()) return res.status(400).json({ error: "Please provide an email." });
-    if(!name || name.trim()) return res.status(400).json({ error: "Please provide a name." });
+    const { email, name, password }: RegisterBody = req.body;
 
     const exists = await User.exists({ email });
     if (exists) return res.status(400).json({ error: "Email already in use." });
@@ -30,10 +30,10 @@ export const register = async (req: Request, res: Response) => {
 };
 
 export const login = async (req: Request, res: Response) => {
-    const { email, password }: LoginBody = req.body;
+    const errors = validateLogin(req.body);
+    if(errors) return res.status(400).json(errors);
 
-    if(!email && !email.trim()) return res.status(400).json({ error: "Please provide an email." });
-    if(!password && !password.trim()) return res.status(400).json({ error: "Please provide a password." });
+    const { email, password }: LoginBody = req.body;
 
     let name = "";
     try {

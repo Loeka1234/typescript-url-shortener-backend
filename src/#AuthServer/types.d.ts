@@ -5,12 +5,17 @@ interface AddUrlBody {
     publicUrl: boolean;
 }
 
- interface RegisterBody {
+interface RegisterBody {
     email: string;
     password: string;
     name: string;
 }
- interface LoginBody {
+interface LoginBody {
     email: string;
     password: string;
+}
+
+interface IError {
+    field: string;
+    message: string;
 }
