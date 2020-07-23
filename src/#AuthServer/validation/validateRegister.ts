@@ -25,6 +25,6 @@ export const validateRegister = (data: RegisterBody): IError | undefined => {
     if (!password.trim().match(/((?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20})/))
         return {
             field: "password",
-            message: "please provide a valid password.",
+            message: "Please provide a valid password. The password should contain at least 1 uppercase letter and 1 lowercase letter.",
         };
 };
