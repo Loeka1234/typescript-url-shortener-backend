@@ -14,11 +14,11 @@ connect();
 
 const app = express();
 
-app.use(cors());
 app.use(morgan("dev"));
 app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors({ origin: "http://localhost:3002", credentials: true }));
 
 app.get("/", (_, res) => res.send("Authentication server working."));
 
@@ -29,4 +29,6 @@ app.delete("/logout", logout);
 
 const PORT = process.env.AUTH_SERVER_PORT || 3001;
 
-app.listen(PORT, () => console.log(`Auth server listening on localhost:${PORT}`));
+app.listen(PORT, () =>
+    console.log(`Auth server listening on localhost:${PORT}`)
+);
