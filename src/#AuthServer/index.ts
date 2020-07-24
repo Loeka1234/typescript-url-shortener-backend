@@ -1,7 +1,7 @@
 import express from "express";
 
 // Routes
-import { register, login, getNewToken, logout } from "./routes/user";
+import { register, login, getNewToken, logout } from "./routes";
 
 // Middlewares
 import cors from "cors";
@@ -18,7 +18,7 @@ app.use(morgan("dev"));
 app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ origin: "http://localhost:3002", credentials: true }));
+app.use(cors({ origin: process.env.ORIGIN, credentials: true }));
 
 app.get("/", (_, res) => res.send("Authentication server working."));
 
